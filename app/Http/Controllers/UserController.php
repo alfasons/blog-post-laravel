@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function logout() {
+    public function logout()
+    {
         auth()->logout();
         return redirect('/')->with('success', 'You are now logged out.');
     }
 
-    public function homepage() {
+    public function homepage()
+    {
         if (auth()->check()) {
             return view('home-page-feed');
         } else {
@@ -21,7 +24,8 @@ class UserController extends Controller
         }
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $incomingFields = $request->validate([
             'loginusername' => 'required',
             'loginpassword' => 'required'
@@ -35,7 +39,8 @@ class UserController extends Controller
         }
     }
 
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $incomingFields = $request->validate([
             'username' => ['required', 'min:3', 'max:20', Rule::unique('users', 'username')],
             'email' => ['required', 'email', Rule::unique('users', 'email')],
@@ -47,5 +52,12 @@ class UserController extends Controller
         $user = User::create($incomingFields);
         auth()->login($user);
         return redirect('/')->with('success', 'Thank you for creating an account.');
+    }
+
+    public function profile(User $user)
+    {
+        $posts = $user->posts()->get();
+
+        return view('users/profile', ['username' => $user->username, 'posts' => $posts, 'total_post_count' => $user->posts()->count()]);
     }
 }

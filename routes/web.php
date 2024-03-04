@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PostController;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 
@@ -13,8 +15,36 @@ use App\Http\Controllers\UserController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+//cate functionalittu
+/*
+Route::get('/admin-page', function () {
+  /*  if(Gate::allows('visitAdminPages')){
+        return 'is admin';
+    }
+    return 'not admin';*
+    return 'is admin';
 
-Route::get('/', [UserController::class,'homepage']);
-Route::post('/register', [UserController::class,'register']);
-Route::post('/login', [UserController::class,'login']);
-Route::post('/logout', [UserController::class,'logout']);
+})->middleware('can:visitAdminPages');
+*/
+
+//user routs
+Route::get('/', [UserController::class,'homepage'])->name('login');
+Route::post('/register', [UserController::class,'register'])->middleware('guest');;
+Route::post('/login', [UserController::class,'login'])->middleware('guest');;
+Route::post('/logout', [UserController::class,'logout'])->middleware('MustBeLoggedIn');;
+
+//post routes
+
+Route::get('/create-post', [PostController::class,'_form'])->middleware('MustBeLoggedIn');
+Route::post('/create-post', [PostController::class,'create'])->middleware('auth');
+Route::get('/posts/{post}', [PostController::class,'singlePost']);
+Route::delete('/posts/{post}', [PostController::class, 'delete'])->middleware('can:delete,post');
+Route::get('/posts/{post}/edit', [PostController::class, 'show_edit_form'])->middleware('can:update,post');
+Route::put('/posts/{post}', [PostController::class, 'update_post'])->middleware('can:update,post');
+
+
+//profile
+
+Route::get('/profile/{user:username}', [UserController::class,'profile']);
+
+
