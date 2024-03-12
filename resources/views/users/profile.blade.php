@@ -28,9 +28,4 @@
         </div>
       </div>
 
-
-
-
-
-
 </x-layout>
