@@ -5,10 +5,40 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class UserController extends Controller
 {
+
+    public function storAvatar(Request $request)
+    {
+      $request->validate([
+            'avatar' => 'required|image|max:2000',
+        ]);
+
+        $user = auth()->user();
+        $fileName = $user->id . '-' . uniqid() . '.jpg';
+
+        $manager = new ImageManager(new Driver);
+        $image = $manager->read($request->file('avatar'));
+        $imgData = $image->cover(120, 120)->toJpeg();
+        Storage::put("public/avatars/".$fileName, $imgData);
+
+        $old_avatar = $user->avartar;
+        $user->avartar = $fileName;
+        $user->save();
+        if ($old_avatar !== '/fallback-avatar.jpg') {
+            Storage::delete(str_replace("/storage/", "/public/", $old_avatar));
+        }
+        return back()->with('success', 'Congrats on new avatar');
+    }
+    public function showAvatarForm()
+    {
+        return view('users.avatar-form');
+    }
     public function logout()
     {
         auth()->logout();

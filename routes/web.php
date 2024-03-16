@@ -31,7 +31,10 @@ Route::get('/admin-page', function () {
 Route::get('/', [UserController::class,'homepage'])->name('login');
 Route::post('/register', [UserController::class,'register'])->middleware('guest');;
 Route::post('/login', [UserController::class,'login'])->middleware('guest');;
-Route::post('/logout', [UserController::class,'logout'])->middleware('MustBeLoggedIn');;
+Route::post('/logout', [UserController::class,'logout'])->middleware('MustBeLoggedIn');
+Route::get('/manage-avatar', [UserController::class,'showAvatarForm'])->middleware('MustBeLoggedIn');
+Route::post('/manage-avatar', [UserController::class,'storAvatar'])->middleware('MustBeLoggedIn');
+
 
 //post routes
 
