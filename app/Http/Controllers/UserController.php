@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Follow;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Facades\View;
 use Intervention\Image\ImageManager;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class UserController extends Controller
 {
@@ -48,7 +50,7 @@ class UserController extends Controller
     public function homepage()
     {
         if (auth()->check()) {
-            return view('home-page-feed');
+            return view('home-page-feed',['posts'=>auth()->user()->feedsPosts()->latest()->get()]);
         } else {
             return view('home-page');
         }
@@ -86,8 +88,33 @@ class UserController extends Controller
 
     public function profile(User $user)
     {
-        $posts = $user->posts()->get();
+        $this->getSharedData($user);
+        return view('users/profile', ['posts' => $user->posts()->latest()->get()]);
 
-        return view('users/profile', ['username' => $user->username, 'posts' => $posts, 'total_post_count' => $user->posts()->count()]);
+
+    }
+
+    public function followers(User $user)
+    {
+        $this->getSharedData($user);
+        return view('users/followers', ['followers' => $user->followers()->latest()->get()]);
+
+
+    }
+    public function following(User $user)
+    {
+        $this->getSharedData($user);
+        return view('users/following', ['following' => $user->followingTheseUsers()->latest()->get()]);
+
+
+    }
+    private function getSharedData($user) {
+        $currentlyFollowing = 0;
+
+        if (auth()->check()) {
+            $currentlyFollowing = Follow::where([['user_id', '=', auth()->user()->id], ['followeduser', '=', $user->id]])->count();
+        }
+
+        View::share('sharedData', ['currentlyFollowing' => $currentlyFollowing, 'avartar' => $user->avartar, 'username' => $user->username, 'postCount' => $user->posts()->count(),'followingCount'=>$user->followingTheseUsers->count(),'followersCount'=>$user->followers->count()]);
     }
 }

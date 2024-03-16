@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('follows', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained();
+            $table->unsignedBigInteger('followeduser');
+            $table->foreign('followeduser')->references('id')->on('users');
             $table->timestamps();
         });
     }
