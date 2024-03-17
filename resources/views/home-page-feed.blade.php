@@ -2,15 +2,15 @@
     <div class="container py-md-5 container--narrow">
 
         @unless ($posts->isEmpty())
-        <h2 class="mb-3 "> Lates feed from those you follow</h2>
-        @foreach ($posts as $post)
+        <h2 class="mb-3 text-center "> Lates feed from those you follow</h2>
 
-        <a href="/posts/{{$post->id}}" class="list-group-item list-group-item-action">
-            <img class="avatar-tiny" src="{{$post->user->avartar}}" />
-            <strong>{{$post->title}}</strong> <span class="small text-muted">  by {{$post->user->username}}  on {{$post->created_at->format('n/j/m/Y')}} </span>
-          </a>
+            @foreach ($posts as $post)
+            <x-post :post="$post"/>
+            @endforeach
 
-        @endforeach
+        <div class="mb-3 mt-3">
+         {{ $posts->links() }}
+        </div>
 
          @else
          <div class="text-center">

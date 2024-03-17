@@ -50,7 +50,7 @@ class UserController extends Controller
     public function homepage()
     {
         if (auth()->check()) {
-            return view('home-page-feed',['posts'=>auth()->user()->feedsPosts()->latest()->get()]);
+            return view('home-page-feed',['posts'=>auth()->user()->feedsPosts()->latest()->paginate(10)]);
         } else {
             return view('home-page');
         }
