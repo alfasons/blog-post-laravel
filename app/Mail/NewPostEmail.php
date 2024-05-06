@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -16,7 +15,7 @@ class NewPostEmail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public $data)
     {
         //
     }
@@ -27,7 +26,9 @@ class NewPostEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Post Email',
+            subject: 'New POST',
+
+
         );
     }
 
@@ -38,6 +39,7 @@ class NewPostEmail extends Mailable
     {
         return new Content(
             view: 'new-post-email',
+            with: ['title'=>$this->data['title'],'name'=>$this->data['name']]
         );
     }
 
