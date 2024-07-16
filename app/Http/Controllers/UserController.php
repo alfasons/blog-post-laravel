@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ourExampleEvent;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Follow;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Gd\Driver;
+
 
 class UserController extends Controller
 {
@@ -43,6 +46,8 @@ class UserController extends Controller
     }
     public function logout()
     {
+
+        event( new ourExampleEvent(['username'=>auth()->user()->username,'action'=>'logout']));
         auth()->logout();
         return redirect('/')->with('success', 'You are now logged out.');
     }
@@ -55,7 +60,6 @@ class UserController extends Controller
             return view('home-page');
         }
     }
-
     public function login(Request $request)
     {
         $incomingFields = $request->validate([
@@ -63,8 +67,11 @@ class UserController extends Controller
             'loginpassword' => 'required'
         ]);
 
+
         if (auth()->attempt(['username' => $incomingFields['loginusername'], 'password' => $incomingFields['loginpassword']])) {
             $request->session()->regenerate();
+            event( new ourExampleEvent(['username'=>auth()->user()->username,'action'=>'login']));
+
             return redirect('/')->with('success', 'You have successfully logged in.');
         } else {
             return redirect('/')->with('danger', 'Invalid login.');
